@@ -1,0 +1,65 @@
+#!/bin/bash
+set -u
+cd "$(dirname $0)"
+
+
+if grep -qF "Host lab-edge1" ~/.ssh/config; then
+  echo "+ entries for .ssh/config already there."
+else
+  echo "+ adding .ssh/config entries..."
+  cat files/ssh_hosts >> ~/.ssh/config
+fi
+
+
+# bgp hosts
+host_list='
+  10.13.37.1
+  10.13.38.1
+  10.13.39.1
+'
+
+for host in ${host_list}; do
+  echo "+ getting known_hosts entry for ${host}..."
+
+  entry="$(ssh-keyscan -T 1 -t ed25519 "${host}" 2>/dev/null)"
+
+  if [[ "${entry}" == "" ]]; then
+    echo "${host} unreachable"
+  else 
+    if grep -qF "${entry}" ~/.ssh/known_hosts; then
+      echo "entry already in .ssh/known_hosts."
+    else
+      echo "adding entry..."
+      echo "${entry}" >> ~/.ssh/known_hosts
+    fi
+  fi
+done
+
+
+# home hosts, access thourgh a jumpbox
+host_list='
+  lab-edge1,10.13.37.2
+  lab-edge2,10.13.38.2
+  lab-spine1,10.13.39.2
+'
+
+for host in ${host_list}; do
+  jumpbox="$(cut -d, -f1 <<< "${host}")"
+  host="$(cut -d, -f2 <<< "${host}")"
+
+  echo "+ getting known_hosts entry for ${host}..."
+
+  entry="$(ssh ${jumpbox} ssh-keyscan -T 1 -t ed25519 "${host}" 2>/dev/null)"
+
+  if [[ "${entry}" == "" ]]; then
+    echo "${host} unreachable"
+  else 
+    if grep -qF "${entry}" ~/.ssh/known_hosts; then
+      echo "entry already in .ssh/known_hosts."
+    else
+      echo "adding entry..."
+      echo "${entry}" >> ~/.ssh/known_hosts
+    fi
+  fi
+done
+

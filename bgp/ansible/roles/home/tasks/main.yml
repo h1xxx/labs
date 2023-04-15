@@ -1,0 +1,22 @@
+- name: update pkg cache
+  apt:
+    update_cache: yes
+
+- name: install packages
+  apt:
+    pkg:
+      - iperf3
+      - daemon
+      - mtr
+      - dnsutils
+    state: present
+
+- name: check if iperf3 is running
+  shell: pgrep -fx 'iperf3 -s' > /dev/null && echo Running || echo NotRunning
+  register: iper3_running
+  changed_when: false
+
+- name: start iperf3 server
+  shell: daemon -- iperf3 -s
+  when: iper3_running.stdout == "NotRunning"
+

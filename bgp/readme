@@ -1,0 +1,100 @@
+BGP lab 
+=======
+
+A lab for testing BGP config and analyzing traffic between different AS.
+
+Warning: access to all hosts in the lab is wide open by default. All user
+public ssh keys from the hosting machine are deployed to each host and serial
+connection has root autologin enabled.
+
+
+requirements
+============
+
+- qemu with working KVM/IOMMU
+- ansible
+- nslookup
+- free address spaces:
+    10.13.37.0/24
+    10.13.38.0/24
+    10.13.39.0/24
+- 3 GB of free RAM
+
+
+setup
+=====
+
+# get all the required files, incl. debian image for virtual machines;
+# VMs created after this step in img dir: edge1 edge2 spine1 home1 home2 home3
+git clone https://github.com/h1xxx/labs
+cd labs
+./00.get_img
+
+# (as root) create bridge and tap interfaces for virtual machines;
+# each interface has a prefix 'lab-'
+./01.net_config
+
+# (as root) configure network and ssh access for each VM by mounting the VM
+# root filesystem and modifying the config files
+./02.vm_config
+
+# test one host to see if everything's ok (will start VM in foreground)
+./qemu_cmd edge1
+ip a
+curl ddg.co
+poweroff
+
+# start all hosts (will start VMs in background)
+./qemu_cmd edge1 edge2 spine1 home1 home2 home3
+
+# put host keys in ~/.ssh/known_hosts and host info in ~/.ssh/config
+./03.ssh_config
+
+#  check if hosts are reachable
+ansible all -i ansible/hosts -m ping
+
+# do stuff
+... go to 'testing' section ...
+
+# power off all VMs
+ansible home -i ansible/hosts -m shell -a "shutdown -h now"
+ansible bgp -i ansible/hosts -m shell -a "shutdown -h now"
+
+# remove all the 'lab-' interfaces from the hosting machine
+./04.net_cleanup
+
+# remove all the 'lab-' entries in 
+./05.ssh_cleanup
+
+
+testing
+=======
+
+# on the hosting machine enable packet forwarding, so the VMs have internet
+# access and can install packages
+printf 1 > /proc/sys/net/ipv4/ip_forward
+
+# configure hosts with ansible
+ansible-playbook -i hosts playbook.yml
+
+
+misc
+=====
+
+# show netowrk config for all hosts
+head -n-1 interfaces/* files/ssh_hosts
+
+# if something goes wrong at any point, reset VMs to the initial state (all
+# machines to not store any changes after poweroff):
+pkill -f ifname=lab-tap
+./qemu_cmd edge1 edge2 spine1 home1 home2 home3
+ansible-playbook -i hosts playbook.yml
+
+# recreate all machines from scratch
+pkill -f ifname=lab-tap
+./00.get_img
+./02.vm_config
+./qemu_cmd edge1 edge2 spine1 home1 home2 home3
+./03.ssh_config
+ansible-playbook -i hosts playbook.yml
+

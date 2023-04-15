@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname $0)"
+
+ip_list='
+  10.13.37.1
+  10.13.38.1
+  10.13.39.1
+  10.13.37.2
+  10.13.38.2
+  10.13.39.2
+'
+
+for ip in ${ip_list}; do
+  sed -i "/^${ip} /d" ~/.ssh/known_hosts
+done
+
+sed '/^$/d' files/ssh_hosts \
+  | grep -vFxf - ~/.ssh/config \
+  > ~/.ssh/config.lab.tmp
+
+sed -z 's|\n\n\n\n||g' ~/.ssh/config.lab.tmp > ~/.ssh/config
+rm ~/.ssh/config.lab.tmp
+

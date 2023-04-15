@@ -1,0 +1,10 @@
+auto lo
+iface lo inet loopback
+
+# main interface for internet access
+allow-hotplug eth0
+iface eth0 inet static
+  address 10.13.38.2/32
+  hwaddress ether 52:54:00:00:38:02
+  gateway 10.13.38.1
+

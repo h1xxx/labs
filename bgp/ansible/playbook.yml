@@ -1,0 +1,10 @@
+- hosts: bgp
+  roles:
+    - all
+    - bgp
+
+- hosts: home
+  roles:
+    - all
+    - home
+

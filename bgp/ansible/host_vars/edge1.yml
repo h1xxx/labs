@@ -1,0 +1,5 @@
+as_ip: 169.254.0.1
+asn: 01337
+neighbor_ip: 169.254.0.2
+neighbor_asn: 01338
+

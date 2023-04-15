@@ -1,0 +1,11 @@
+labs
+====
+
+A collection of labs for network testing and pentesting.
+
+List of labs:
+- BGP network testing
+- nothing else yet, lol
+
+Usage: go to lab dir.
+

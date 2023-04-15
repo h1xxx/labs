@@ -1,0 +1,78 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname $0)"
+
+# sets up basic networking and ssh access for the host
+host_setup() {
+  host="$1"
+
+  echo "+ ${host}"
+
+  echo 'mounting the image...'
+  local lo_dev
+  local mnt_dir
+  lo_dev="$(losetup -Pf --show img/${host}.img)"
+  mnt_dir="$(mktemp -d)"
+  mount "${lo_dev}p1" "${mnt_dir}"
+
+  echo 'configuring the host...'
+
+  cp interfaces/${host} "${mnt_dir}/etc/network/interfaces"
+  echo 'nameserver 9.9.9.9' > "${mnt_dir}/etc/resolv.conf"
+  echo ${host} > "${mnt_dir}/etc/hostname"
+
+  # disble ipv6 in apt
+  echo 'Acquire::ForceIPv4 "true";' \
+    > "${mnt_dir}/etc/apt/apt.conf.d/99force-ipv4"
+
+  sed -i 's|consoleblank=0|& net.ifnames=0 ipv6.disable=1|' \
+    "${mnt_dir}/etc/default/grub"
+
+  sed -i 's|consoleblank=0|& net.ifnames=0 ipv6.disable=1|' \
+    "${mnt_dir}/boot/grub/grub.cfg"
+
+  # prevent any issues that might come up when apt tries to resolve domains in
+  # cloud image
+  # todo: investigate wtf (curl works most of the time)
+  echo '127.0.0.1 localhost local' > "${mnt_dir}/etc/hosts"
+  nslookup deb.debian.org \
+    | awk "/^Address: / { print \$2  \" deb.debian.org\" ; exit }" \
+    >> "${mnt_dir}/etc/hosts"
+  nslookup security.debian.org \
+    | awk "/^Address: / { print \$2  \" security.debian.org\" ; exit }" \
+    >> "${mnt_dir}/etc/hosts"
+
+  # set root autologin
+  mkdir -p "${mnt_dir}/etc/systemd/system/serial-getty@ttyS0.service.d"
+  cat << EOF > "${mnt_dir}/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf"
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\\\u' --noclear --autologin root %I \$TERM
+EOF
+
+  echo 'setting up ssh access...'
+
+  # make the host accessible to EVERRRYOOONE!!! (todo: insert gary oldman meme)
+  install -d -m0700 "${mnt_dir}/root/.ssh"
+  cat /home/*/.ssh/*.pub > "${mnt_dir}/root/.ssh/authorized_keys"
+  chmod 600 "${mnt_dir}/root/.ssh/authorized_keys"
+
+  # generate host ssh keys
+  rm -f "${mnt_dir}/etc/ssh/ssh_host_ed25519_key*"
+  chroot "${mnt_dir}" \
+    ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key > /dev/null
+
+  echo -e 'cleaning up...\n'
+  umount "${mnt_dir}"
+  rmdir  "${mnt_dir}"
+  losetup -d "${lo_dev}"
+}
+
+# configure hosts
+host_setup edge1
+host_setup edge2
+host_setup spine1
+host_setup home1
+host_setup home2
+host_setup home3
+

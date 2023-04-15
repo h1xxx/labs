@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname $0)"
+
+mkdir -p img
+
+# get the debian OS image
+url_prefix='https://cloud.debian.org/images/cloud/bullseye'
+img_ver='20230124-1270'
+img_file="debian-11-nocloud-amd64-${img_ver}.raw"
+
+wget -nc -P img "${url_prefix}/${img_ver}/${img_file}"
+
+# create a copy for each host
+hosts='edge1 edge2 spine1 home1 home2 home3'
+for host in ${hosts}; do
+  cp -av "img/${img_file}" img/${host}.img
+done
+

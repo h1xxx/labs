@@ -1,0 +1,68 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname $0)"
+
+# creates a bridge interface
+# usage: br_config <bridge interface name> <bridge ip address>
+br_config() {
+  iface="$1"
+  ip="$2"
+
+  ip link add ${iface} type bridge
+  ip link set ${iface} up
+  ip addr add ${ip} dev ${iface}
+}
+
+# creates virual switches to use by all hosts
+create_bridges() {
+
+  # BGP connection between edge1 and edge2
+  ip link add lab-br-e1-e2 type bridge
+  ip link set lab-br-e1-e2 up
+
+  # BGP connection between edge1 and spine1
+  ip link add lab-br-e1-s1 type bridge
+  ip link set lab-br-e1-s1 up
+
+  # LANs and default gateways
+  br_config lab-br-gw-e1  10.13.37.254/24
+  br_config lab-br-gw-e2  10.13.38.254/24
+  br_config lab-br-gw-s1 10.13.39.254/24
+}
+
+# creates a tap interface
+# usage: tap_config <tap interface name> <bridge name>
+tap_config() {
+  iface="$1"
+  br="$2"
+
+  ip tuntap add name ${iface} mode tap
+  ip link set ${iface} master ${br}
+  ip link set ${iface} up promisc on
+}
+
+# creates virtual, level-2 ports for all hosts
+create_taps() {
+
+  # edge1 interfaces
+  tap_config lab-tap-e1-eth0 lab-br-gw-e1
+  tap_config lab-tap-e1-eth1 lab-br-e1-e2
+  tap_config lab-tap-e1-eth2 lab-br-e1-s1
+
+  # edge2 interfaces
+  tap_config lab-tap-e2-eth0 lab-br-gw-e2
+  tap_config lab-tap-e2-eth1 lab-br-e1-e2
+
+  # spine1 interfaces
+  tap_config lab-tap-s1-eth0 lab-br-gw-s1
+  tap_config lab-tap-s1-eth1 lab-br-e1-s1
+
+  # home hosts
+  tap_config lab-tap-h1-eth0 lab-br-gw-e1
+  tap_config lab-tap-h2-eth0 lab-br-gw-e2
+  tap_config lab-tap-h3-eth0 lab-br-gw-s1
+}
+
+create_bridges
+create_taps
+

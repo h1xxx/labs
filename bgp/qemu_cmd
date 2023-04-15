@@ -1,0 +1,77 @@
+#!/bin/bash
+set -euo pipefail
+
+hosts="$@"
+
+# adds qemu config args for a network device
+# usage: add_net_device <qemu device id> <tap interface to use>
+
+add_net_device() {
+  id="$1"
+  tap="$2"
+
+  a+=" -device virtio-net-pci,netdev=${id}"
+  a+=" -netdev tap,id=${id},ifname=${tap},script=no,downscript=no"
+}
+
+
+# add base qemu arguments
+# usage add_qemu_args <host name>
+add_qemu_args() {
+  local host="$1"
+
+  a+=' -nodefaults'
+  a+=' -no-user-config'
+  a+=' -vga none'
+  a+=' -smp sockets=1,cores=2,threads=1'
+  a+=' -m 512M'
+  a+=' -cpu host,kvm=off'
+  a+=' -machine q35,accel=kvm'
+  a+=' -enable-kvm'
+  a+=' -device amd-iommu'
+  a+=" -drive file=img/${host}.img,if=virtio,index=0,media=disk,format=raw"
+  a+=' -snapshot'
+}
+
+for host in ${hosts}; do
+  # variable with all qemu arguments
+  a=''
+
+  add_qemu_args ${host}
+
+	case "${host}" in
+		edge1)
+			add_net_device net0 lab-tap-e1-eth0
+			add_net_device net1 lab-tap-e1-eth1
+			add_net_device net2 lab-tap-e1-eth2
+			;;
+		edge2)
+			add_net_device net0 lab-tap-e2-eth0
+			add_net_device net1 lab-tap-e2-eth1
+			;;
+		spine1)
+			add_net_device net0 lab-tap-s1-eth0
+			add_net_device net1 lab-tap-s1-eth1
+			;;
+		home1)
+			add_net_device net0 lab-tap-h1-eth0 ;;
+		home2)
+			add_net_device net0 lab-tap-h2-eth0 ;;
+		home3)
+			add_net_device net0 lab-tap-h3-eth0 ;;
+    *)
+      echo "unknown host: ${host}"
+      continue
+			;;
+  esac
+
+  if [[ $# -eq 1 ]]; then
+    a+=' -serial mon:stdio'
+    qemu-system-x86_64 ${a}
+  else
+    echo "starting ${host}..."
+    qemu-system-x86_64 ${a} >/dev/null 2>&1 &
+    sleep 1
+  fi
+done
+

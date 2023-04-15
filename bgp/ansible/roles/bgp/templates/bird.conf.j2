@@ -1,0 +1,26 @@
+router id {{ as_ip }};
+
+protocol kernel {
+# learn;            # Learn all alien routes from the kernel
+  persist;          # Don't remove routes on bird shutdown
+  scan time 20;     # Scan kernel routing table every 20 seconds
+# import none;      # Default is import all
+  export none;      # Default is export none
+# kernel table 5;   # Kernel table to synchronize with (default: main
+}
+
+protocol bgp {
+  description "bird bgp config for {{ ansible_facts['hostname'] }}";
+  local as {{ asn }};
+  neighbor {{ neighbor_ip }} as {{ neighbor_asn }};
+  multihop;
+#  rr client;
+  graceful restart;
+  import all;
+  export all;
+}
+
+protocol device {
+  scan time 30;
+}
+

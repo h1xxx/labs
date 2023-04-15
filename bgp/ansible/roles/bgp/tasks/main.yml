@@ -1,0 +1,41 @@
+- name: enable ipv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+
+# enable arp filtering so the hosting machine doesn't ask for home machines' ip
+- name: enable arp filtering by default
+  sysctl:
+    name: net.ipv4.conf.default.rp_filter
+    value: '1'
+    sysctl_set: yes
+
+- name: enable arp filtering on all existing ports
+  sysctl:
+    name: net.ipv4.conf.all.rp_filter
+    value: '1'
+    sysctl_set: yes
+
+- name: update pkg cache
+  apt:
+    update_cache: yes
+
+- name: install bird
+  apt:
+    name: bird
+    state: present
+
+- name: deploy bird.conf
+  template:
+    src: bird.conf.j2
+    dest: /etc/bird/bird.conf
+  when: inventory_hostname in groups['edge']
+  notify: restart bird
+
+- name: start bird daemon
+  systemd:
+    name: bird.service
+    state: started
+    enabled: true
+
