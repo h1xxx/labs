@@ -1,5 +1,7 @@
 as_id: 10.13.38.1
 asn: 1337
-neighbor_ip: 169.254.0.1
-neighbor_asn: 1337
+bird_neighbor_ip: 169.254.0.1
+bird_neighbor_asn: 1337
 edge1_static_routes:
+edge1_spine1_bgp:
+

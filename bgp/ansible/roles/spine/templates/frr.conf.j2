@@ -1,0 +1,10 @@
+router bgp 1338
+bgp router-id 10.13.39.1
+neighbor 169.254.1.1 remote-as 1337
+neighbor 169.254.1.1 next-hop-self
+
+no bgp ebgp-requires-policy
+no bgp network import-check
+
+bgp graceful-restart preserve-fw-state
+

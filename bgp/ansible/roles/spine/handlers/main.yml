@@ -1,4 +1,4 @@
-- name: restart ffr
+- name: restart frr
   service:
-    name: ffr
+    name: frr
     state: restarted

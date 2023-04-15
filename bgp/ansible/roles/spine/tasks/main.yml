@@ -28,11 +28,17 @@
     name: frr
     state: present
 
-#- name: deploy frr.conf
-#  template:
-#    src: frr.conf.j2
-#    dest: /etc/frr/frr.conf
-#  notify: restart frr
+- name: deploy frr.conf
+  template:
+    src: frr.conf.j2
+    dest: /etc/frr/frr.conf
+  notify: restart frr
+
+- name: deploy frr 'daemons' config
+  copy:
+    src: files/daemons
+    dest: /etc/frr/daemons
+  notify: restart frr
 
 - name: start frr daemon
   systemd:
