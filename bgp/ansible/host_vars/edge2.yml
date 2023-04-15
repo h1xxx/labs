@@ -1,5 +1,5 @@
 as_id: 10.13.38.1
-asn: 1338
+asn: 1337
 neighbor_ip: 169.254.0.1
 neighbor_asn: 1337
 edge1_static_routes:

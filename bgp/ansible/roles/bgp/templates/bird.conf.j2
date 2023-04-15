@@ -3,7 +3,7 @@ log syslog all;
 
 protocol kernel {
   persist;
-  scan time 30;
+  scan time 10;
   import all;
   export all;
 }
@@ -12,12 +12,17 @@ protocol bgp {
   local as {{ asn }};
   neighbor {{ neighbor_ip }} as {{ neighbor_asn }};
   graceful restart;
+  next hop self;
   import all;
   export all;
 }
 
 protocol device {
-  scan time 30;
+  scan time 10;
+}
+
+protocol direct {
+  interface "*";
 }
 
 {{ edge1_static_routes }}

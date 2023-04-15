@@ -1,7 +1,7 @@
 as_id: 10.13.37.1
 asn: 1337
 neighbor_ip: 169.254.0.2
-neighbor_asn: 1338
+neighbor_asn: 1337
 edge1_static_routes: |
   protocol static {
     # reroute the traffic to google dns on edge2 via edge1
