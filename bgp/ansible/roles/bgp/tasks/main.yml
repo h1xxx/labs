@@ -1,26 +1,29 @@
-- name: masquerade external traffic
+- name: masquerade external traffic on eth0
   ansible.builtin.iptables:
     table: nat
     chain: POSTROUTING
     out_interface: eth0
     jump: MASQUERADE
 
+# todo: drop masquerading between bgp routers
+- name: masquerade external traffic on eth1
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: eth1
+    jump: MASQUERADE
+
+- name: masquerade external traffic on eth2
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: eth2
+    jump: MASQUERADE
+  when: inventory_hostname == 'edge1'
+
 - name: enable ipv4 forwarding
   sysctl:
     name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-
-# enable arp filtering so the hosting machine doesn't ask for home machines' ip
-- name: enable arp filtering by default
-  sysctl:
-    name: net.ipv4.conf.default.rp_filter
-    value: '1'
-    sysctl_set: yes
-
-- name: enable arp filtering on all existing ports
-  sysctl:
-    name: net.ipv4.conf.all.rp_filter
     value: '1'
     sysctl_set: yes
 

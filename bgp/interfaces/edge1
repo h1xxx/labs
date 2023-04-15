@@ -11,13 +11,13 @@ iface eth0 inet static
 # interface to connect to edge2 over bgp
 allow-hotplug eth1
 iface eth1 inet static
-  address 169.254.0.1/16
+  address 169.254.0.1/24
   hwaddress ether 52:54:00:00:00:01
 
 # interface to connect to spine1 over bgp
 allow-hotplug eth2
 iface eth2 inet static
-  address 169.254.1.1/16
+  address 169.254.1.1/24
   hwaddress ether 52:54:00:00:01:01
 
 # interface to connect to home machines

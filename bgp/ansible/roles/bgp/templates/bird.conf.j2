@@ -2,18 +2,15 @@ router id {{ as_id }};
 log syslog all;
 
 protocol kernel {
-  learn;            # learn all alien routes from the kernel
-  persist;          # don't remove routes on bird shutdown
-  scan time 30;     # scan kernel routing table every 20 seconds
-  import all;       # default is import all
-  export all;       # default is export none
+  persist;
+  scan time 30;
+  import all;
+  export all;
 }
 
 protocol bgp {
-  description "bird bgp config for {{ ansible_facts['hostname'] }}";
   local as {{ asn }};
   neighbor {{ neighbor_ip }} as {{ neighbor_asn }};
-  multihop;
   graceful restart;
   import all;
   export all;
@@ -22,4 +19,6 @@ protocol bgp {
 protocol device {
   scan time 30;
 }
+
+{{ edge1_static_routes }}
 
