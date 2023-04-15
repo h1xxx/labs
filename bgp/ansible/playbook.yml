@@ -1,7 +1,12 @@
-- hosts: bgp
+- hosts: edge
   roles:
     - all
-    - bgp
+    - edge
+
+- hosts: spine
+  roles:
+    - all
+    - spine
 
 - hosts: home
   roles:

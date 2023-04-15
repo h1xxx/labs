@@ -40,7 +40,6 @@
   template:
     src: bird.conf.j2
     dest: /etc/bird/bird.conf
-  when: inventory_hostname in groups['edge']
   notify: restart bird
 
 - name: start bird daemon

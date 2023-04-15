@@ -1,0 +1,42 @@
+- name: masquerade external traffic on eth0
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: eth0
+    jump: MASQUERADE
+
+# todo: drop masquerading between bgp routers
+- name: masquerade external traffic on eth1
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: eth1
+    jump: MASQUERADE
+
+- name: enable ipv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+
+- name: update pkg cache
+  apt:
+    update_cache: yes
+
+- name: install frr
+  apt:
+    name: frr
+    state: present
+
+#- name: deploy frr.conf
+#  template:
+#    src: frr.conf.j2
+#    dest: /etc/frr/frr.conf
+#  notify: restart frr
+
+- name: start frr daemon
+  systemd:
+    name: frr.service
+    state: started
+    enabled: true
+
