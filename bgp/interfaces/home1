@@ -4,7 +4,7 @@ iface lo inet loopback
 # main interface for internet access
 allow-hotplug eth0
 iface eth0 inet static
-  address 10.13.37.2/32
-  hwaddress ether 52:54:00:00:37:02
-  gateway 10.13.37.1
+  address 10.13.47.2/32
+  hwaddress ether 52:54:00:00:47:02
+  gateway 10.13.47.1
 

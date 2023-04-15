@@ -1,12 +1,12 @@
-router id {{ as_ip }};
+router id {{ as_id }};
+log syslog all;
 
 protocol kernel {
-# learn;            # Learn all alien routes from the kernel
-  persist;          # Don't remove routes on bird shutdown
-  scan time 20;     # Scan kernel routing table every 20 seconds
-# import none;      # Default is import all
-  export none;      # Default is export none
-# kernel table 5;   # Kernel table to synchronize with (default: main
+  learn;            # learn all alien routes from the kernel
+  persist;          # don't remove routes on bird shutdown
+  scan time 30;     # scan kernel routing table every 20 seconds
+  import all;       # default is import all
+  export all;       # default is export none
 }
 
 protocol bgp {
@@ -14,7 +14,6 @@ protocol bgp {
   local as {{ asn }};
   neighbor {{ neighbor_ip }} as {{ neighbor_asn }};
   multihop;
-#  rr client;
   graceful restart;
   import all;
   export all;

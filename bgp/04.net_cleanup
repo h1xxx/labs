@@ -7,15 +7,22 @@ ip link del lab-br-gw-e1 type bridge
 ip link del lab-br-gw-e2 type bridge
 ip link del lab-br-gw-s1 type bridge
 
+ip link del lab-br-lan-h1 type bridge
+ip link del lab-br-lan-h2 type bridge
+ip link del lab-br-lan-h3 type bridge
+
 ip tuntap del name lab-tap-e1-eth0 mode tap
 ip tuntap del name lab-tap-e1-eth1 mode tap
 ip tuntap del name lab-tap-e1-eth2 mode tap
+ip tuntap del name lab-tap-e1-eth3 mode tap
 
 ip tuntap del name lab-tap-e2-eth0 mode tap
 ip tuntap del name lab-tap-e2-eth1 mode tap
+ip tuntap del name lab-tap-e2-eth2 mode tap
 
 ip tuntap del name lab-tap-s1-eth0 mode tap
 ip tuntap del name lab-tap-s1-eth1 mode tap
+ip tuntap del name lab-tap-s1-eth2 mode tap
 
 ip tuntap del name lab-tap-h1-eth0 mode tap
 ip tuntap del name lab-tap-h2-eth0 mode tap

@@ -44,14 +44,17 @@ for host in ${hosts}; do
 			add_net_device net0 lab-tap-e1-eth0
 			add_net_device net1 lab-tap-e1-eth1
 			add_net_device net2 lab-tap-e1-eth2
+			add_net_device net3 lab-tap-e1-eth3
 			;;
 		edge2)
 			add_net_device net0 lab-tap-e2-eth0
 			add_net_device net1 lab-tap-e2-eth1
+			add_net_device net2 lab-tap-e2-eth2
 			;;
 		spine1)
 			add_net_device net0 lab-tap-s1-eth0
 			add_net_device net1 lab-tap-s1-eth1
+			add_net_device net2 lab-tap-s1-eth2
 			;;
 		home1)
 			add_net_device net0 lab-tap-h1-eth0 ;;

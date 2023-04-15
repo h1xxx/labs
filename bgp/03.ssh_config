@@ -38,9 +38,9 @@ done
 
 # home hosts, access thourgh a jumpbox
 host_list='
-  lab-edge1,10.13.37.2
-  lab-edge2,10.13.38.2
-  lab-spine1,10.13.39.2
+  lab-edge1,10.13.47.2
+  lab-edge2,10.13.48.2
+  lab-spine1,10.13.49.2
 '
 
 for host in ${host_list}; do

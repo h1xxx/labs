@@ -13,16 +13,16 @@ Host lab-spine1
 
 Host lab-home1
         User      root
-        HostName  10.13.37.2
+        HostName  10.13.47.2
         ProxyJump lab-edge1
 
 Host lab-home2
         User      root
-        HostName  10.13.38.2
+        HostName  10.13.48.2
         ProxyJump lab-edge2
 
 Host lab-home3
         User      root
-        HostName  10.13.39.2
+        HostName  10.13.49.2
         ProxyJump lab-spine1
 

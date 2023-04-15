@@ -24,10 +24,18 @@ create_bridges() {
   ip link add lab-br-e1-s1 type bridge
   ip link set lab-br-e1-s1 up
 
-  # LANs and default gateways
+  # default gateways for the bgp routers
   br_config lab-br-gw-e1  10.13.37.254/24
   br_config lab-br-gw-e2  10.13.38.254/24
   br_config lab-br-gw-s1 10.13.39.254/24
+
+  # LAN networks for home machines, connected also to respective bgp routers
+  ip link add lab-br-lan-h1 type bridge
+  ip link add lab-br-lan-h2 type bridge
+  ip link add lab-br-lan-h3 type bridge
+  ip link set lab-br-lan-h1 up
+  ip link set lab-br-lan-h2 up
+  ip link set lab-br-lan-h3 up
 }
 
 # creates a tap interface
@@ -48,19 +56,22 @@ create_taps() {
   tap_config lab-tap-e1-eth0 lab-br-gw-e1
   tap_config lab-tap-e1-eth1 lab-br-e1-e2
   tap_config lab-tap-e1-eth2 lab-br-e1-s1
+  tap_config lab-tap-e1-eth3 lab-br-lan-h1
 
   # edge2 interfaces
   tap_config lab-tap-e2-eth0 lab-br-gw-e2
   tap_config lab-tap-e2-eth1 lab-br-e1-e2
+  tap_config lab-tap-e2-eth2 lab-br-lan-h2
 
   # spine1 interfaces
   tap_config lab-tap-s1-eth0 lab-br-gw-s1
   tap_config lab-tap-s1-eth1 lab-br-e1-s1
+  tap_config lab-tap-s1-eth2 lab-br-lan-h3
 
   # home hosts
-  tap_config lab-tap-h1-eth0 lab-br-gw-e1
-  tap_config lab-tap-h2-eth0 lab-br-gw-e2
-  tap_config lab-tap-h3-eth0 lab-br-gw-s1
+  tap_config lab-tap-h1-eth0 lab-br-lan-h1
+  tap_config lab-tap-h2-eth0 lab-br-lan-h2
+  tap_config lab-tap-h3-eth0 lab-br-lan-h3
 }
 
 create_bridges

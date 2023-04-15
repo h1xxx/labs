@@ -14,3 +14,10 @@ iface eth1 inet static
   address 169.254.0.2/16
   hwaddress ether 52:54:00:00:00:02
 
+# interface to connect to home machines
+allow-hotplug eth2
+iface eth2 inet static
+  address 10.13.48.1/24
+  hwaddress ether 52:54:00:00:48:01
+
+

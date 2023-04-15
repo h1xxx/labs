@@ -2,14 +2,14 @@
 
 edge1	ansible_host=lab-edge1   ansible_user=root
 edge2	ansible_host=lab-edge2   ansible_user=root
-spine1	ansible_host=lab-spine1  ansible_user=root
+#spine1	ansible_host=lab-spine1  ansible_user=root
 
 
 [home]
 
 home1	ansible_host=lab-home1   ansible_user=root
 home2	ansible_host=lab-home2   ansible_user=root
-home3	ansible_host=lab-home3   ansible_user=root
+#home3	ansible_host=lab-home3   ansible_user=root
 
 
 [edge]
