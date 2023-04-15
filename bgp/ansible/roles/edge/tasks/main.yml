@@ -37,8 +37,8 @@
     state: present
 
 - name: deploy bird.conf
-  template:
-    src: bird.conf.j2
+  copy:
+    src: 'files/{{ inventory_hostname }}.bird.conf'
     dest: /etc/bird/bird.conf
   notify: restart bird
 
