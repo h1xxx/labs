@@ -24,7 +24,7 @@ add_qemu_args() {
   a+=' -no-user-config'
   a+=' -vga none'
   a+=' -smp sockets=1,cores=2,threads=1'
-  a+=' -m 512M'
+  a+=' -m 256M'
   a+=' -cpu host,kvm=off'
   a+=' -machine q35,accel=kvm'
   a+=' -enable-kvm'
