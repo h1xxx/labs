@@ -22,13 +22,13 @@ add_qemu_args() {
 
   a+=' -nodefaults'
   a+=' -no-user-config'
+  a+=' -display none'
   a+=' -vga none'
   a+=' -smp sockets=1,cores=2,threads=1'
   a+=' -m 256M'
   a+=' -cpu host,kvm=off'
   a+=' -machine q35,accel=kvm'
   a+=' -enable-kvm'
-  a+=' -device amd-iommu'
   a+=" -drive file=img/${host}.img,if=virtio,index=0,media=disk,format=raw"
   a+=' -snapshot'
 }
