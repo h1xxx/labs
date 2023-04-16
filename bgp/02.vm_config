@@ -2,6 +2,8 @@
 set -euo pipefail
 cd "$(dirname $0)"
 
+command -v nslookup >/dev/null || (echo missing nslookup && exit 1)
+
 # sets up basic networking and ssh access for the host
 host_setup() {
   host="$1"
