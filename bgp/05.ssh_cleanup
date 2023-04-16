@@ -19,6 +19,6 @@ sed '/^$/d' files/ssh_hosts \
   | grep -vFxf - ~/.ssh/config \
   > ~/.ssh/config.lab.tmp
 
-sed -z 's|\n\n\n\n||g' ~/.ssh/config.lab.tmp > ~/.ssh/config
+sed -z 's|\n\n\n\n|\n|g' ~/.ssh/config.lab.tmp > ~/.ssh/config
 rm ~/.ssh/config.lab.tmp
 
