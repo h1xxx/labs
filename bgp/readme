@@ -19,19 +19,22 @@ requirements
     10.13.38.0/24
     10.13.39.0/24
 - 3 GB of free RAM
+- 15 GB of free disk
 
 
 setup
 =====
 
-# get all the required files, incl. debian image for virtual machines;
-# VMs created after this step in img dir: edge1 edge2 spine1 home1 home2 home3
+# get the scripts
 git clone https://github.com/h1xxx/labs
-cd labs
+cd labs/bgp
+
+# download debian cloud image and create all lab VMs: edge1, edge2, spine1,
+# home1, home2 and home3
 ./00.get_img
 
-# (as root) create bridge and tap interfaces for virtual machines;
-# each interface has a prefix 'lab-'
+# (as root) create bridge and tap interfaces for virtual machines; each
+# interface is prefixed with 'lab-'
 ./01.net_config
 
 # (as root) configure network and ssh access for each VM by mounting the VM
@@ -44,42 +47,68 @@ ip a
 curl ddg.co
 poweroff
 
-# start all hosts (will start VMs in background)
+# start all hosts (will start all VMs in background)
 ./qemu_cmd edge1 edge2 spine1 home1 home2 home3
 
-# put host keys in ~/.ssh/known_hosts and host info in ~/.ssh/config
+# wait for the VMs to boot, i.e. until they're idle
+top
+
+# put host keys in ~/.ssh/known_hosts and host info in ~/.ssh/config; before
+# that make sure that your .ssh keys have default names like id_ed25519, id_rsa
 ./03.ssh_config
 
 #  check if hosts are reachable
 ansible all -i ansible/hosts -m ping
-
-# do stuff
-... go to 'testing' section ...
-
-# power off all VMs
-ansible home -i ansible/hosts -m shell -a "shutdown -h now"
-ansible bgp -i ansible/hosts -m shell -a "shutdown -h now"
-
-# remove all the 'lab-' interfaces from the hosting machine
-./04.net_cleanup
-
-# remove all the 'lab-' entries in 
-./05.ssh_cleanup
-
-
-testing
-=======
 
 # on the hosting machine enable packet forwarding, so the VMs have internet
 # access and can install packages
 printf 1 > /proc/sys/net/ipv4/ip_forward
 
 # configure hosts with ansible
-ansible-playbook -i hosts playbook.yml
+ansible-playbook -i ansible/hosts ansible/playbook.yml
+
+# do stuff
+... go to 'testing' section ...
+
+# kill all VMs (all the changes to the fs are lost after poweroff anyway)
+pkill -f ifname=lab-tap
+
+# (as root) remove all the 'lab-' interfaces from the hosting machine
+./04.net_cleanup
+
+# remove all the lab entries in .ssh/config and .ssh/known_hosts
+./05.ssh_cleanup
+
+
+testing
+=======
+
+# only edge1 announces traffic...
+ssh lab-edge1 grep 'route\ ' /etc/bird/bird.conf
+ssh lab-edge2 grep 'route\ ' /etc/bird/bird.conf
+ssh lab-spine1 grep 'route\ ' /etc/frr/frr.conf
+
+# ... but all the BGP hosts have the routes that were announced to them
+ssh lab-edge1 ip r
+ssh lab-edge2 ip r
+ssh lab-spine1 ip r
+
+# home2 (attached to edge2) routes traffic to 8.8.8.8 via edge1
+# gateway (10.13.37.254), but traffic to 8.8.8.7 goes through edge2 gateway
+# (10.13.38.254)
+ssh lab-home2 traceroute 8.8.8.8
+ssh lab-home2 traceroute 8.8.8.7
+
+# home3 (attached to spine1) routes traffic to 8.8.8.8 and to 8.8.8.7 via edge1
+# gateway (10.13.37.254), but traffic to 1.1.1.1 goes through spine1 gateway
+# (10.13.39.254)
+ssh lab-home3 traceroute 8.8.8.8
+ssh lab-home3 traceroute 8.8.8.7
+ssh lab-home3 traceroute 1.1.1.1
 
 
 misc
-=====
+====
 
 # show netowrk config for all hosts
 head -n-1 interfaces/* files/ssh_hosts
@@ -96,5 +125,9 @@ pkill -f ifname=lab-tap
 ./02.vm_config
 ./qemu_cmd edge1 edge2 spine1 home1 home2 home3
 ./03.ssh_config
-ansible-playbook -i hosts playbook.yml
+ansible-playbook -i ansible/hosts ansible/playbook.yml
 
+# power off all VMs in a clean way
+ansible home -i ansible/hosts -m shell -a "shutdown -h now"
+ansible edge -i ansible/hosts -m shell -a "shutdown -h now"
+ansible spine -i ansible/hosts -m shell -a "shutdown -h now"
