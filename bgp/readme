@@ -61,8 +61,9 @@ top
 ansible all -i ansible/hosts -m ping
 
 # on the hosting machine enable packet forwarding, so the VMs have internet
-# access and can install packages
+# access and can install packages (change the eth0 interface if needed)
 printf 1 > /proc/sys/net/ipv4/ip_forward
+iptables -t nat -o eth0 -A POSTROUTING -j MASQUERADE
 
 # configure hosts with ansible
 ansible-playbook -i ansible/hosts ansible/playbook.yml
