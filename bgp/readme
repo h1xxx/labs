@@ -7,6 +7,18 @@ Warning: access to all hosts in the lab is wide open by default. All user
 public ssh keys from the hosting machine are deployed to each host and serial
 connection has root autologin enabled.
 
+All VMs are reset to the inital state after poweroff.
+
+Network structure:
+
+┌─────┐    ┌─────┐    ┌─────┐    ┌─────┐
+│home1├────┤edge1├────┤edge2├────┤home2│
+└─────┘    └──┬──┘    └─────┘    └─────┘
+              │
+┌─────┐    ┌──┴───┐
+│home3├────┤spine1│
+└─────┘    └──────┘
+
 
 requirements
 ============
