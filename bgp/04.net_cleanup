@@ -1,30 +1,38 @@
 #!/bin/bash
-set -euo pipefail
+set -u
 
-ip link del lab-br-e1-e2 type bridge
-ip link del lab-br-e1-s1 type bridge
-ip link del lab-br-gw-e1 type bridge
-ip link del lab-br-gw-e2 type bridge
-ip link del lab-br-gw-s1 type bridge
+bridge_list='
+  lab-br-e1-e2
+  lab-br-e1-s1
+  lab-br-gw-e1
+  lab-br-gw-e2
+  lab-br-gw-s1
+  lab-br-lan-h1
+  lab-br-lan-h2
+  lab-br-lan-h3
+'
 
-ip link del lab-br-lan-h1 type bridge
-ip link del lab-br-lan-h2 type bridge
-ip link del lab-br-lan-h3 type bridge
+for bridge in ${bridge_list}; do
+  ip link del ${bridge} type bridge
+done
 
-ip tuntap del name lab-tap-e1-eth0 mode tap
-ip tuntap del name lab-tap-e1-eth1 mode tap
-ip tuntap del name lab-tap-e1-eth2 mode tap
-ip tuntap del name lab-tap-e1-eth3 mode tap
+tap_list='
+  lab-tap-e1-eth0
+  lab-tap-e1-eth1
+  lab-tap-e1-eth2
+  lab-tap-e1-eth3
+  lab-tap-e2-eth0
+  lab-tap-e2-eth1
+  lab-tap-e2-eth2
+  lab-tap-s1-eth0
+  lab-tap-s1-eth1
+  lab-tap-s1-eth2
+  lab-tap-h1-eth0
+  lab-tap-h2-eth0
+  lab-tap-h3-eth0
+'
 
-ip tuntap del name lab-tap-e2-eth0 mode tap
-ip tuntap del name lab-tap-e2-eth1 mode tap
-ip tuntap del name lab-tap-e2-eth2 mode tap
-
-ip tuntap del name lab-tap-s1-eth0 mode tap
-ip tuntap del name lab-tap-s1-eth1 mode tap
-ip tuntap del name lab-tap-s1-eth2 mode tap
-
-ip tuntap del name lab-tap-h1-eth0 mode tap
-ip tuntap del name lab-tap-h2-eth0 mode tap
-ip tuntap del name lab-tap-h3-eth0 mode tap
+for tap in ${tap_list}; do
+  ip tuntap del name ${tap} mode tap
+done
 
