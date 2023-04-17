@@ -5,9 +5,9 @@ A lab for testing BGP config and analyzing traffic between different AS.
 
 Warning: access to all hosts in the lab is wide open by default. All user
 public ssh keys from the hosting machine are deployed to each host and serial
-connection has root autologin enabled.
+connection has root autologin enabled. There's no root password.
 
-All VMs are reset to the inital state after poweroff.
+All VMs are reset to the initial state after poweroff.
 
 Network structure:
 
@@ -18,6 +18,9 @@ Network structure:
 ┌─────┐    ┌──┴───┐
 │home3├────┤spine1│
 └─────┘    └──────┘
+
+All BGP routers have access to internet directly via hosting machine.
+All home VMs have access to internet only through connected router.
 
 
 requirements
