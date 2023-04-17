@@ -1,4 +1,6 @@
 
+### start of BGP lab hosts
+
 Host lab-edge1
         User      root
         HostName  10.13.37.1
@@ -25,4 +27,6 @@ Host lab-home3
         User      root
         HostName  10.13.49.2
         ProxyJump lab-spine1
+
+### end of BGP lab hosts
 
