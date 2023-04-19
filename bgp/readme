@@ -56,6 +56,13 @@ cd labs/bgp
 # root filesystem and modifying the config files
 ./02.vm_config
 
+# on the hosting machine enable packet forwarding, so the VMs have internet
+# access and can install packages;
+# example for iptables (highly dependant on the hosting machine config):
+printf 1 > /proc/sys/net/ipv4/ip_forward
+iptables -i FORWARD -j ACCEPT
+iptables -t nat -o eth0 -A POSTROUTING -j MASQUERADE
+
 # test one host to see if everything's ok (will start VM in foreground)
 ./qemu_cmd edge1
 ip a
@@ -74,11 +81,6 @@ top
 
 #  check if hosts are reachable
 ansible all -i ansible/hosts -m ping
-
-# on the hosting machine enable packet forwarding, so the VMs have internet
-# access and can install packages (change the eth0 interface if needed)
-printf 1 > /proc/sys/net/ipv4/ip_forward
-iptables -t nat -o eth0 -A POSTROUTING -j MASQUERADE
 
 # configure hosts with ansible
 ansible-playbook -i ansible/hosts ansible/playbook.yml
