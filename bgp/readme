@@ -60,7 +60,7 @@ cd labs/bgp
 # access and can install packages;
 # example for iptables (highly dependant on the hosting machine config):
 printf 1 > /proc/sys/net/ipv4/ip_forward
-iptables -i FORWARD -j ACCEPT
+iptables -P FORWARD ACCEPT
 iptables -t nat -o eth0 -A POSTROUTING -j MASQUERADE
 
 # test one host to see if everything's ok (will start VM in foreground)
