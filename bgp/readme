@@ -63,6 +63,10 @@ printf 1 > /proc/sys/net/ipv4/ip_forward
 iptables -P FORWARD ACCEPT
 iptables -t nat -o eth0 -A POSTROUTING -j MASQUERADE
 
+# (optional) add ssh keys to the ssh-agent if they're encrypted
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
 # test one host to see if everything's ok (will start VM in foreground)
 ./qemu_cmd edge1
 ip a
